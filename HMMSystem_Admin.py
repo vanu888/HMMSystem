@@ -8,6 +8,7 @@ import os
 # Sample data structure to hold medication records
 patients = {}
 current_password = "password"  # current password
+password_file = "current_password.json"  # File to store the current password
 data_file = "patients.json"  # File to store medication data using json
 
 #Create main application
@@ -17,8 +18,8 @@ class HospitalMedicineManagementAdminApp:
         self.root.title("Hospital Medicine Management System - Admin") # Main title
         self.root.geometry("800x600") # Window frame size
       
-        
-
+        # Load password file
+        self.load_password()
         # Load saved medication data
         self.load_patients()
 
@@ -51,7 +52,6 @@ class HospitalMedicineManagementAdminApp:
         self.notebook.add(self.check_tab, text="Check") 
         self.notebook.add(self.about_tab, text="About")
 
-
         self.create_login_tab()
         self.create_update_tab()
         self.create_display_tab()
@@ -64,15 +64,6 @@ class HospitalMedicineManagementAdminApp:
 
         # Show welcome screen
         self.show_welcome_screen()
-
-    #Fuction to lock the tabs
-    def lock_tabs(self):
-        for i in range(1, 6):  # Disable all tabs except the first (login)
-            self.notebook.tab(i, state='disabled')
-
-    def unlock_tabs(self):
-        for i in range(1, 6):  # Enable all tabs except the first (login)
-            self.notebook.tab(i, state='normal')
 
     #Function to show welcome screen
     def show_welcome_screen(self):
@@ -98,13 +89,13 @@ class HospitalMedicineManagementAdminApp:
         self.welcome_window.destroy()
         self.root.deiconify()
         self.notebook.select(self.login_tab)
-
+        
     # Create login tab
     def create_login_tab(self):
         self.login_frame = ttk.Frame(self.login_tab)
         self.login_frame.pack(fill="both", expand=True)
 
-        self.password_label = ttk.Label(self.login_frame, text="Password")
+        self.password_label = ttk.Label(self.login_frame, text="Password:")
         self.password_label.pack(pady=5)
         self.password_entry = ttk.Entry(self.login_frame, show="*")
         self.password_entry.pack(pady=5)
@@ -114,54 +105,80 @@ class HospitalMedicineManagementAdminApp:
 
         self.change_password_button = ttk.Button(self.login_frame, text="Change Password", command=self.change_password)
         self.change_password_button.pack(pady=10)
-     
-    # Function to login process 
+
+    #Fuction to lock the tabs
+    def lock_tabs(self):
+        for i in range(1, 6):  # Disable all tabs except the first (login)
+            self.notebook.tab(i, state='disabled')
+
+    def unlock_tabs(self):
+        for i in range(1, 6):  # Enable all tabs except the first (login)
+            self.notebook.tab(i, state='normal')
+
+    # Function for login       
     def login(self):
         password = self.password_entry.get()
-        if password == current_password:
+        if password == current_password:  # Only check the password
             messagebox.showinfo("Login", "Login successful!")
-            self.unlock_tabs()
-            self.notebook.select(self.display_tab)
+            self.unlock_tabs()  # Unlock tabs on successful login
+            self.notebook.select(self.display_tab)  # Switch to the display tab
         else:
             messagebox.showerror("Login", "Invalid password!")
-            self.lock_tabs()
-
-    # Function to change password
+            self.lock_tabs()  # Keep tabs locked if login fails
+       
+    # Create a window to change password 
     def change_password(self):
+        # Create a new window for changing the password
         self.change_password_window = tk.Toplevel(self.root)
         self.change_password_window.title("Change Password")
         self.change_password_window.geometry("300x200")
-
+        
+        # Old Password Entry
         old_password_label = ttk.Label(self.change_password_window, text="Old Password:")
         old_password_label.pack(pady=5)
         self.old_password_entry = ttk.Entry(self.change_password_window, show="*")
         self.old_password_entry.pack(pady=5)
 
+        # New Password Entry
         new_password_label = ttk.Label(self.change_password_window, text="New Password:")
         new_password_label.pack(pady=5)
         self.new_password_entry = ttk.Entry(self.change_password_window, show="*")
         self.new_password_entry.pack(pady=5)
 
+        # Submit Button
         submit_button = ttk.Button(self.change_password_window, text="Submit", command=self.submit_new_password)
         submit_button.pack(pady=10)
+    
+    # Load the current password from the file
+    def load_password(self):
+        global current_password
+        if os.path.exists(password_file):
+            with open(password_file, 'r') as f:
+                data = json.load(f)
+                current_password = data.get("password", "password")  # Default password if not  ( use as password )
+                
+    # Save the new password to the file
+    def save_password(self):
+        with open(password_file, 'w') as f:
+            json.dump({"password": current_password}, f)
 
-    # Function to submit new password
+    # Function for submit new password
     def submit_new_password(self):
         global current_password
-
-        old_password = self.old_password_entry.get()
-        new_password = self.new_password_entry.get()
-
-        # Check old password
+        old_password = self.old_password_entry.get() # Get input for old password
+        new_password = self.new_password_entry.get() # Get input for new password
+        
+        # Check old passsowrd match or not 
         if old_password != current_password:
-            messagebox.showerror("Error", "Old password is incorrect.")
+            messagebox.showerror("Error", "Old password is incorrect.") # Show error message
         else:
             if new_password:
                 current_password = new_password
+                self.save_password()  # Save the new password
                 messagebox.showinfo("Success", "Password changed successfully!")
-                self.change_password_window.destroy()
+                self.change_password_window.destroy()  # Close the password change window
             else:
-                messagebox.showerror("Error", "New password cannot be empty.")
+                messagebox.showerror("Error", "New password cannot be empty.") # Show error message and load the current password from the file
 
     # Create display tab for display all data
     def create_display_tab(self):
@@ -366,8 +383,7 @@ class HospitalMedicineManagementAdminApp:
             with open(data_file, 'r') as f:
                 global patients
                 patients = json.load(f)
-
-    
+ 
     # Create a tab for check data
     def create_check_tab(self):
         self.check_frame = ttk.Frame(self.check_tab)
@@ -414,7 +430,6 @@ class HospitalMedicineManagementAdminApp:
             # Show an error message data not found
             messagebox.showinfo("Search Results", "No Patient found.")
 
-
     # Create a tab for about
     def create_about_tab(self):
         self.about_frame = ttk.Frame(self.about_tab)
@@ -423,7 +438,6 @@ class HospitalMedicineManagementAdminApp:
         # Label to show about section data
         about_label = ttk.Label(self.about_frame, text="Hospital Medicine Management System - Admin\nDeveloped by: Vihanga Anuththara\nFollow me on GitHub: vanu888\nPower to FOSS :)", font=("Arial", 12))
         about_label.pack(pady=20)
-
 
 if __name__ == "__main__":
     root = tk.Tk()
