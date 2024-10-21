@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import json
 import os
 
-# Sample data structure to hold medication records
-medications = {}
+# Sample data structure to hold medicines records
+medicines = {}
 current_password = "password"  # current password
 password_file = "current_password.json"  # File to store the current password
-data_file = "medications.json"  # File to store medication data using json
+data_file = "medicines.json"  # File to store medicines data using json
 
 #Create main application
 class HospitalMedicineManagementApp:
@@ -21,8 +21,8 @@ class HospitalMedicineManagementApp:
         
         # Load password file
         self.load_password()
-        # Load saved medication data
-        self.load_medications()
+        # Load saved medicines data
+        self.load_medicines()
         
 
         # Create style
@@ -43,29 +43,25 @@ class HospitalMedicineManagementApp:
         self.login_tab = ttk.Frame(self.notebook)
         self.medicine_tab = ttk.Frame(self.notebook)
         self.display_tab = ttk.Frame(self.notebook)
-
-        #Frame for Issue medicine -- 24.09.2024 (Bosco sir)
         self.issue_tab = ttk.Frame(self.notebook)
-
         self.check_tab = ttk.Frame(self.notebook)
+        self.chart_tab = ttk.Frame(self.notebook)
         self.about_tab = ttk.Frame(self.notebook)
 
         self.notebook.add(self.login_tab, text="Login")
-        self.notebook.add(self.display_tab, text="Display Medications")
-
-        #Add new tab for Issue medicine -- 24.09.2024 (Bosco sir)
-        self.notebook.add(self.issue_tab, text="Issue Medications")
-
-        self.notebook.add(self.medicine_tab, text="Medications")
+        self.notebook.add(self.display_tab, text="Display Medicines")
+        self.notebook.add(self.issue_tab, text="Issue Medicines")
+        self.notebook.add(self.medicine_tab, text="Medicines")
         self.notebook.add(self.check_tab, text="Check") 
+        self.notebook.add(self.chart_tab, text="Chart")
         self.notebook.add(self.about_tab, text="About")
 
         self.create_login_tab()
         self.create_medicine_tab()
         self.create_display_tab()
-        #Add new tab for Issue medicine -- 24.09.2024 (Bosco sir)
         self.create_issue_tab()
         self.create_check_tab()
+        self.create_chart_tab()
         self.create_about_tab()
 
         # disable all tabs except login
@@ -119,12 +115,12 @@ class HospitalMedicineManagementApp:
     
     # Function to lock tabs
     def lock_tabs(self):
-        for i in range(1, 6):  # Disable all tabs except the first (login)
+        for i in range(1, 7):  # Disable all tabs except the first (login)
             self.notebook.tab(i, state='disabled')
 
     # Function to unlock tabs
     def unlock_tabs(self):
-        for i in range(1, 6):  # Enable all tabs except the first (login)
+        for i in range(1, 7):  # Enable all tabs except the first (login)
             self.notebook.tab(i, state='normal')
     
     # Function for login        
@@ -199,8 +195,8 @@ class HospitalMedicineManagementApp:
         self.display_frame.pack(fill="both", expand=True)
 
         self.tree = ttk.Treeview(self.display_frame, columns=("ID", "Name", "Quantity", "Supplier"), show='headings')
-        self.tree.heading("ID", text="Medication ID")
-        self.tree.heading("Name", text="Medication Name")
+        self.tree.heading("ID", text="Medicine ID")
+        self.tree.heading("Name", text="Medicine Name")
         self.tree.heading("Quantity", text="Quantity")
         self.tree.heading("Supplier", text="Supplier")
         self.tree.pack(fill="both", expand=True)
@@ -208,11 +204,8 @@ class HospitalMedicineManagementApp:
         self.refresh_button = ttk.Button(self.display_frame, text="Refresh Data", command=self.refresh_data)
         self.refresh_button.pack(pady=10)
 
-        self.export_button = ttk.Button(self.display_frame, text="Export All Data to PDF", command=self.export_all_data_to_pdf)
+        self.export_button = ttk.Button(self.display_frame, text="Export All Data", command=self.export_all_data_to_pdf)
         self.export_button.pack(pady=10)
-        
-        self.plot_button = ttk.Button(self.display_frame, text="Graph Medication Data", command=self.plot_medication_data)
-        self.plot_button.pack(pady=10)
      
     # Function for refresh the data   
     def refresh_data(self):
@@ -220,22 +213,22 @@ class HospitalMedicineManagementApp:
         for item in self.tree.get_children():
             self.tree.delete(item)
         # Insert updated data
-        for med_id, info in medications.items():
+        for med_id, info in medicines.items():
             self.tree.insert("", "end", values=(med_id, info['name'], info['quantity'], info['supplier']))
 
     # Function for export data as a pdf
     def export_all_data_to_pdf(self):
-        if not medications:
+        if not medicines:
             messagebox.showwarning("Warning", "No data to export.")
             return
 
         pdf_file_name = "Medcines data by HMMSystem.pdf" # Create a variable to assign pdf name
         c = canvas.Canvas(pdf_file_name, pagesize=letter)
-        c.drawString(100, 750, "Medication Records")
+        c.drawString(100, 750, "Medicines Records")
         c.drawString(100, 730, "===================")
 
         y_position = 710
-        for med_id, info in medications.items():
+        for med_id, info in medicines.items():
             c.drawString(100, y_position, f"ID: {med_id}, Name: {info['name']}, Quantity: {info['quantity']}, Supplier: {info['supplier']}")
             y_position -= 20  # Move down for the next entry
 
@@ -244,33 +237,14 @@ class HospitalMedicineManagementApp:
                 y_position = 750  # Reset y position for new page
 
         c.save()
-        messagebox.showinfo("Success", f"Exported all data to {pdf_file_name}.") # Show a succuss message
-    
-    # Function to plot medication data   
-    def plot_medication_data(self):
-        if not medications:
-            messagebox.showwarning("Warning", "No medication data to plot.") # Show a message ,when no data to plot
-            return
-
-        names = [info['name'] for info in medications.values()] # Take names
-        quantities = [info['quantity'] for info in medications.values()] # Take quantities
-
-        plt.figure(figsize=(10, 6))
-        plt.bar(names, quantities, color='skyblue') # Draw bar graph
-        plt.xlabel('Medication Name') # X Label name
-        plt.ylabel('Quantity')  # Y Label name
-        plt.title('Medication Stock Levels') # Graph title
-        plt.xticks(rotation=45) # Rotate
-        plt.tight_layout()
-        plt.show() # Show the graph
+        messagebox.showinfo("Success", f"Exported all data to {pdf_file_name}.") # Show a succuss message       
         
-        
-    # Create Issue medications tab -- 24.09.2024 (Bosco sir)
+    # Create Issue medicines tab
     def create_issue_tab(self):
         self.issue_frame = ttk.Frame(self.issue_tab)
         self.issue_frame.pack(fill="both", expand=True)
 
-        self.issue_id_label = ttk.Label(self.issue_frame, text= "Medicine ID")
+        self.issue_id_label = ttk.Label(self.issue_frame, text= "Medicine ID: ")
         self.issue_id_label.pack(pady=5)
         self.issue_id_entry = ttk.Entry(self.issue_frame)
         self.issue_id_entry.pack(pady=5)
@@ -281,31 +255,31 @@ class HospitalMedicineManagementApp:
         self.issue_quantity_entry.pack(pady=5)
 
         #button to submit update data
-        self.issue_button = ttk.Button(self.issue_frame, text="Issue medications", command=self.issue_medications)
+        self.issue_button = ttk.Button(self.issue_frame, text="Issue medicines", command=self.issue_medicines)
         self.issue_button.pack(pady=10)
 
-    #Function for Issue medications -- 24.09.2024 (Bosco sir)
-    def issue_medications(self):
+    #Function for Issue medicines -- 24.09.2024 (Bosco sir)
+    def issue_medicines(self):
         med_id = self.issue_id_entry.get()
         quantity_to_issue = self.issue_quantity_entry.get()
 
         #Check if stores have enough quantity or not
-        if med_id in medications and quantity_to_issue.isdigit():
+        if med_id in medicines and quantity_to_issue.isdigit():
             quantity_to_issue = int(quantity_to_issue)
-            current_quantity = medications[med_id]['quantity']
+            current_quantity = medicines[med_id]['quantity']
             
             # Check whether stores have enough quantity or not
             if quantity_to_issue > current_quantity:
                 messagebox.showerror("Warning","Not enough quantity available to issue!")
             else:
-                medications[med_id]['quantity'] -= quantity_to_issue # Issue the quantity
-                messagebox.showinfo("Success", f"Issued {quantity_to_issue} of {medications [med_id]['name']} (ID: {med_id})")
+                medicines[med_id]['quantity'] -= quantity_to_issue # Issue the quantity
+                messagebox.showinfo("Success", f"Issued {quantity_to_issue} of {medicines [med_id]['name']} (ID: {med_id})")
 
-                self.save_medications() #Save the updated data
+                self.save_medicines() #Save the updated data
                 self.clear_entries() #Clear the entry fields
                 self.refresh_data() #Refresh the Display tab to show updated quantities
         else:
-            messagebox.showerror("Error","Invalid medication ID or quantity") # Show an error message
+            messagebox.showerror("Error","Invalid medicine ID or quantity") # Show an error message
     
 
     # Create medicine tab
@@ -313,12 +287,12 @@ class HospitalMedicineManagementApp:
         self.medicine_frame = ttk.Frame(self.medicine_tab)
         self.medicine_frame.pack(fill="both", expand=True)
 
-        self.id_label = ttk.Label(self.medicine_frame, text="Medication ID:")
+        self.id_label = ttk.Label(self.medicine_frame, text="Medicine ID:")
         self.id_label.pack(pady=5)
         self.id_entry = ttk.Entry(self.medicine_frame)
         self.id_entry.pack(pady=5)
 
-        self.name_label = ttk.Label(self.medicine_frame, text="Medication Name:")
+        self.name_label = ttk.Label(self.medicine_frame, text="Medicine Name:")
         self.name_label.pack(pady=5)
         self.name_entry = ttk.Entry(self.medicine_frame)
         self.name_entry.pack(pady=5)
@@ -333,63 +307,63 @@ class HospitalMedicineManagementApp:
         self.supplier_entry = ttk.Entry(self.medicine_frame)
         self.supplier_entry.pack(pady=5)
 
-        self.add_button = ttk.Button(self.medicine_frame, text="Add Medication", command=self.add_medication)
+        self.add_button = ttk.Button(self.medicine_frame, text="Add Medicine", command=self.add_medicine)
         self.add_button.pack(pady=10)
 
-        self.update_button = ttk.Button(self.medicine_frame, text="Update Medication", command=self.update_medication)
+        self.update_button = ttk.Button(self.medicine_frame, text="Update Medicine", command=self.update_medicine)
         self.update_button.pack(pady=10)
 
-        self.delete_button = ttk.Button(self.medicine_frame, text="Delete Medication", command=self.delete_medication)
+        self.delete_button = ttk.Button(self.medicine_frame, text="Delete Medicine", command=self.delete_medicine)
         self.delete_button.pack(pady=10)
     
-    # Function for add medications
-    def add_medication(self):
+    # Function for add medicines
+    def add_medicine(self):
         med_id = self.id_entry.get()
         name = self.name_entry.get()
         quantity = self.quantity_entry.get()
         supplier = self.supplier_entry.get()
 
         if med_id and name and quantity.isdigit():
-            if med_id in medications:
-                messagebox.showerror("Error", "Medication ID already exists. Please use a different ID.")
+            if med_id in medicines:
+                messagebox.showerror("Error", "Medicine ID already exists. Please use a different ID.")
             else:
-                medications[med_id] = {"name": name, "quantity": int(quantity), "supplier": supplier}
+                medicines[med_id] = {"name": name, "quantity": int(quantity), "supplier": supplier}
                 messagebox.showinfo("Success", f"Added {name} with ID {med_id} and quantity {quantity}.")
-                self.save_medications()  # Save medications after adding
+                self.save_medicines()  # Save medicines after adding
                 self.clear_entries()
                 self.refresh_data()
         else:
             messagebox.showerror("Error", "Please enter valid ID, name, quantity and a supplier.")
 
-    # Function for update medication data
-    def update_medication(self):
+    # Function for update medicine data
+    def update_medicine(self):
         med_id = self.id_entry.get()
-        if med_id in medications:
+        if med_id in medicines:
             name = self.name_entry.get()
             quantity = self.quantity_entry.get()
             supplier = self.supplier_entry.get()
             if name and quantity.isdigit():
-                medications[med_id] = {"name": name, "quantity": int(quantity), "supplier": supplier}
+                medicines[med_id] = {"name": name, "quantity": int(quantity), "supplier": supplier}
                 messagebox.showinfo("Success", f"Updated {med_id} to {name} with quantity {quantity} and {supplier}.")
-                self.save_medications()  # Save medications after updating
+                self.save_medicines()  # Save medicines after updating
                 self.clear_entries()
                 self.refresh_data()
             else:
                 messagebox.showerror("Error", "Please enter valid name, quantity and supplier.")
         else:
-            messagebox.showerror("Error", "Medication ID not found.")
+            messagebox.showerror("Error", "Medicines ID not found.")
 
-    # Function for delete medication data
-    def delete_medication(self):
+    # Function for delete medicine data
+    def delete_medicine(self):
         med_id = self.id_entry.get()
-        if med_id in medications:
-            del medications[med_id]
-            messagebox.showinfo("Success", f"Deleted medication with ID {med_id}.")
-            self.save_medications()  # Save medications after deleting
+        if med_id in medicines:
+            del medicines[med_id]
+            messagebox.showinfo("Success", f"Deleted medicine with ID {med_id}.")
+            self.save_medicines()  # Save medicines after deleting
             self.clear_entries()
             self.refresh_data()
         else:
-            messagebox.showerror("Error", "Medication ID not found.")
+            messagebox.showerror("Error", "Medicine ID not found.")
     
     # Function for Clear entries        
     def clear_entries(self):
@@ -401,64 +375,101 @@ class HospitalMedicineManagementApp:
         self.search_entry.delete(0, tk.END)
 
     # Function for save data
-    def save_medications(self):
+    def save_medicines(self):
         with open(data_file, 'w') as f:
-            json.dump(medications, f)
+            json.dump(medicines, f)
 
     # Function for load json dataset
-    def load_medications(self):
+    def load_medicines(self):
         if os.path.exists(data_file):
             with open(data_file, 'r') as f:
-                global medications
-                medications = json.load(f)
+                global medicines
+                medicines = json.load(f)
 
     # Create checking tab for search and check data
     def create_check_tab(self):
         self.check_frame = ttk.Frame(self.check_tab)
         self.check_frame.pack(fill="both", expand=True)
 
-        # Check Medication Section
-        self.check_label = ttk.Label(self.check_frame, text="Enter Medication ID to Check:")
+        # Check Medicine Section
+        self.check_label = ttk.Label(self.check_frame, text="Enter Medicine ID to Check:")
         self.check_label.pack(pady=5)
         self.check_entry = ttk.Entry(self.check_frame)
         self.check_entry.pack(pady=5)
 
-        self.check_button = ttk.Button(self.check_frame, text="Check Medication", command=self.check_medication)
+        self.check_button = ttk.Button(self.check_frame, text="Check Medicine", command=self.check_medicine)
         self.check_button.pack(pady=10)
 
-        # Search Medication Section
+        # Search Medicine Section
         self.search_label = ttk.Label(self.check_frame, text="Enter Search Term:")
         self.search_label.pack(pady=5)
         self.search_entry = ttk.Entry(self.check_frame)
         self.search_entry.pack(pady=5)
 
-        self.search_button = ttk.Button(self.check_frame, text="Search Medication", command=self.search_medication)
+        self.search_button = ttk.Button(self.check_frame, text="Search Medicine", command=self.search_medicine)
         self.search_button.pack(pady=10)
      
-    # Function for check medication data using ID 
-    def check_medication(self):
+    # Function for check medicine data using ID 
+    def check_medicine(self):
         med_id = self.check_entry.get()
-        if med_id in medications:
-            med_info = medications[med_id]
-            messagebox.showinfo("Medication Found", f"ID: {med_id}, Name: {med_info['name']}, Quantity: {med_info['quantity']}.")
+        if med_id in medicines:
+            med_info = medicines[med_id]
+            messagebox.showinfo("Medicine Found", f"ID: {med_id}, Name: {med_info['name']}, Quantity: {med_info['quantity']}.")
         else:
-            messagebox.showerror("Error", "Medication ID not found.")
+            messagebox.showerror("Error", "Medicine ID not found.")
 
-    # Function for search medication using a term
-    def search_medication(self):
+    # Function for search medicine using a term
+    def search_medicine(self):
         search_term = self.search_entry.get()
-        results = [med_id for med_id, info in medications.items() if search_term.lower() in info['name'].lower()]
+        results = [med_id for med_id, info in medicines.items() if search_term.lower() in info['name'].lower()]
         if results:
             messagebox.showinfo("Search Results", "Found: " + ", ".join(results))
         else:
-            messagebox.showinfo("Search Results", "No medications found.")
+            messagebox.showinfo("Search Results", "No medicines found.")
 
+    # Create chart tab
+    def create_chart_tab(self):
+        self.chart_frame = ttk.Frame(self.chart_tab)
+        self.chart_frame.pack(fill="both", expand=True)
+        self.company_label = ttk.Label(self.chart_frame, text="Enter supplier:")
+        self.company_label.pack(pady=5)
+        self.company_entry = ttk.Entry(self.chart_frame)
+        self.company_entry.pack(pady=5)
+        self.plot_button = ttk.Button(self.chart_frame, text="Graph Medicines Data", command=self.plot_medicine_data)
+        self.plot_button.pack(pady=10)
+        
+    # Function to plot medicines data   
+    def plot_medicine_data(self):
+        supplier_name = self.company_entry.get()
+        if not supplier_name:
+            messagebox.showwarning("Warning", "Please enter a supplier name!")
+            return
+
+        # Filter medicines by supplier
+        filtered_medicines = {med_id: info for med_id, info in medicines.items() if info['supplier'] == supplier_name}
+        
+        if not filtered_medicines:
+            messagebox.showwarning("Warning", "No medicines found for this supplier!")
+            return
+
+        names = [info['name'] for info in filtered_medicines.values()]  # Take names
+        quantities = [info['quantity'] for info in filtered_medicines.values()]  # Take quantities
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(names, quantities, color='skyblue')  # Draw bar graph
+        plt.xlabel('Medicine Name')  # X Label name
+        plt.ylabel('Quantity')  # Y Label name
+        plt.title(f'Medicines from Supplier: {supplier_name}')  # Graph title
+        plt.xticks(rotation=45)  # Rotate
+        plt.tight_layout()
+        plt.show()  # Show the graph
+  
     # Create about section tab
     def create_about_tab(self):
         self.about_frame = ttk.Frame(self.about_tab)
         self.about_frame.pack(fill="both", expand=True)
         # About section data
-        about_label = ttk.Label(self.about_frame, text="Hospital Medicine Management System\nDeveloped by: Vihanga Anuththara\nFollow me on Github: vanu888\npower to FOSS :)")
+        about_label = ttk.Label(self.about_frame, text="Hospital Medicine Management System\nDeveloped by: Vihanga Anuththara \nFollow me on Github: vanu888 \npower to FOSS :)")
         about_label.pack(pady=20)
 
 if __name__ == "__main__":
