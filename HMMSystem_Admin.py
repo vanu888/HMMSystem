@@ -5,11 +5,11 @@ from reportlab.pdfgen import canvas
 import json
 import os
 
-# Sample data structure to hold medication records
+# Sample data structure to hold patients records
 patients = {}
 current_password = "password"  # current password
 password_file = "current_password.json"  # File to store the current password
-data_file = "patients.json"  # File to store medication data using json
+data_file = "patients.json"  # File to store patients data using json
 
 #Create main application
 class HospitalMedicineManagementAdminApp:
@@ -20,7 +20,7 @@ class HospitalMedicineManagementAdminApp:
       
         # Load password file
         self.load_password()
-        # Load saved medication data
+        # Load saved patients data
         self.load_patients()
 
         # Create style
@@ -51,6 +51,7 @@ class HospitalMedicineManagementAdminApp:
         self.notebook.add(self.update_tab, text="Update Data")
         self.notebook.add(self.check_tab, text="Check") 
         self.notebook.add(self.about_tab, text="About")
+
 
         self.create_login_tab()
         self.create_update_tab()
@@ -125,7 +126,8 @@ class HospitalMedicineManagementAdminApp:
         else:
             messagebox.showerror("Login", "Invalid password!")
             self.lock_tabs()  # Keep tabs locked if login fails
-       
+    
+    
     # Create a window to change password 
     def change_password(self):
         # Create a new window for changing the password
@@ -234,7 +236,7 @@ class HospitalMedicineManagementAdminApp:
         self.updateStatus_frame.pack(fill="both", expand=True)
 
         # Get patient ID
-        self.updateStatus_id_label = ttk.Label(self.updateStatus_frame, text="Patient ID")
+        self.updateStatus_id_label = ttk.Label(self.updateStatus_frame, text="Patient ID: ")
         self.updateStatus_id_label.pack(pady=5)
         self.updateStatus_id_entry = ttk.Entry(self.updateStatus_frame)
         self.updateStatus_id_entry.pack(pady=5)
@@ -383,7 +385,8 @@ class HospitalMedicineManagementAdminApp:
             with open(data_file, 'r') as f:
                 global patients
                 patients = json.load(f)
- 
+
+    
     # Create a tab for check data
     def create_check_tab(self):
         self.check_frame = ttk.Frame(self.check_tab)
@@ -430,6 +433,7 @@ class HospitalMedicineManagementAdminApp:
             # Show an error message data not found
             messagebox.showinfo("Search Results", "No Patient found.")
 
+
     # Create a tab for about
     def create_about_tab(self):
         self.about_frame = ttk.Frame(self.about_tab)
@@ -438,6 +442,7 @@ class HospitalMedicineManagementAdminApp:
         # Label to show about section data
         about_label = ttk.Label(self.about_frame, text="Hospital Medicine Management System - Admin\nDeveloped by: Vihanga Anuththara\nFollow me on GitHub: vanu888\nPower to FOSS :)", font=("Arial", 12))
         about_label.pack(pady=20)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
