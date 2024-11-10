@@ -23,6 +23,12 @@ This Python program is designed to manage medicine inventory in a hospital setti
    git clone https://github.com/vanu888/HMMSystem.git
    cd HMMSystem
 
+## User Manual
+For detailed instructions on using this project, please refer to the [User Manual](https://vanu888.github.io/HMMSystem/#chapter1). 
+Alternatively, you can visit the user manual directly at:  
+[https://vanu888.github.io/HMMSystem/#chapter1](https://vanu888.github.io/HMMSystem/#chapter1)
+
+
 ## Credits
 The PNG images used in this project were sourced from free-to-use platforms. For more details, see the [credits.txt](credits.txt) file.
 
