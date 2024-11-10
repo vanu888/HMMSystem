@@ -1,13 +1,12 @@
-Credits for PNG Files
+### Credits for PNG Files
 
 The PNG files used in this project are sourced from various platforms offering free-to-use resources. The original creators are unknown, but the files are believed to be free for commercial use. If you are the creator of any of these files and would like to be credited, please contact me, and I will update the attribution accordingly.
 
 These files may have been sourced from websites such as:
-
-    Pixabay
-    Unsplash
-    Freepik
-    Pexels
-    Icons8
+- Pixabay
+- Unsplash
+- Freepik
+- Pexels
+- Icons8
 
 All files are used under their respective free-use licenses, including for commercial purposes.
