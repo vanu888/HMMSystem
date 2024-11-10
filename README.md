@@ -22,3 +22,7 @@ This Python program is designed to manage medicine inventory in a hospital setti
    ```bash
    git clone https://github.com/vanu888/HMMSystem.git
    cd HMMSystem
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
