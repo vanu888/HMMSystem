@@ -24,7 +24,7 @@ This Python program is designed to manage medicine inventory in a hospital setti
    cd HMMSystem
 
 ## Credits
-The PNG images used in this project were sourced from free-to-use platforms. For more details, see the [CREDITS.txt](CREDITS.txt) file.
+The PNG images used in this project were sourced from free-to-use platforms. For more details, see the [credits.txt](credits.txt) file.
 
 
 ## License
