@@ -33,7 +33,7 @@ pdf = resource_path("Hospital Management System - Admin/icons/pdf.png")
 
 
 def open_user_manual():
-    url = "https://vanu888.github.io/HMMSystem/#chapter3"  # User Manual page link
+    url = "https://vihanga-anuththara.github.io/HMMSystem/#chapter3"  # User Manual page link
     webbrowser.open(url)
 
 
@@ -632,7 +632,7 @@ class HospitalManagementAdminApp:
         # About section data
         about_label = ttk.Label(
             self.about_frame,
-            text="Hospital Management System - Admin\nDeveloped by: Vihanga Anuththara \nFollow me on Github: vanu888 \npower to FOSS :)",
+            text="Hospital Management System - Admin\nDeveloped by: Vihanga Anuththara \nFollow me on Github: vihanga-anuththara \npower to FOSS :)",
         )
         about_label.pack(pady=20)
 
