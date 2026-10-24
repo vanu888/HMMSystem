@@ -6,7 +6,7 @@ kiwisolver==1.5.0
 matplotlib==3.11.1
 numpy==2.5.1
 packaging==26.3
-pillow==12.3.0
+Pillow>=13.0.0
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
 reportlab==5.0.0
